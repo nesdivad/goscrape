@@ -22,6 +22,7 @@ The tool uses a configuration file to define starting URL, rulesets etc.
         "https://ndla.no/article/erklaering-for-informasjonskapsler",
         ...
     ]
-    "depth": 1
+    "depth": 1,
+    "outputPath": "output"
 }
 ```
