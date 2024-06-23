@@ -1,5 +1,5 @@
 {
-    "url": "https://ndla.no/subject:5e53694a-c8eb-4871-8558-71523941c28e/topic:c06064a8-54b1-4e75-b154-b3fa7b01d225/resource:0fce6cd6-0db5-47d5-b6ef-65021dbf2497",
+    "url": "https://ndla.no/",
     "rules": [
         {
             "querySelector": "article[data-ndla-article]",
@@ -7,6 +7,9 @@
             "excerptSelector": "div[class*=ingress]",
             "contentSelector": "p"
         }
+    ],
+    "urlFilters": [
+        "https://ndla.no/article/erklaering-for-informasjonskapsler"
     ],
     "depth": 1
 }

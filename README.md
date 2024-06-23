@@ -18,6 +18,10 @@ The tool uses a configuration file to define starting URL, rulesets etc.
         }
         ...
     ],
+    "urlFilters": [
+        "https://ndla.no/article/erklaering-for-informasjonskapsler",
+        ...
+    ]
     "depth": 1
 }
 ```

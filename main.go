@@ -6,46 +6,51 @@ import (
 	"fmt"
 	"goscrape/structs"
 	"net/url"
-	"time"
 
 	"os"
 
 	"github.com/gocolly/colly"
 )
 
-func main() {
-	var configflag string
+var configflag string
+
+func init() {
 	flag.StringVar(&configflag, "config", "", "Path to config file")
 	flag.Parse()
+}
 
-	config, err := parseFile(configflag)
+func main() {
+	config, err := parseConfig(configflag)
 	if err != nil {
 		panic(fmt.Sprintf("Could not parse configuration file. \n Error: %s", err))
 	}
 
 	sitehost, err := parseSiteHost(config.URL)
 	if err != nil {
-		panic(err.Error())
+		panic(fmt.Sprintf("Could not parse url. \n Error: %s", err))
 	}
 
-	c := colly.NewCollector(colly.AllowedDomains(sitehost))
+	c := colly.NewCollector(
+		colly.AllowedDomains(sitehost),
+		colly.MaxDepth(config.Depth),
+	)
+	c.AllowURLRevisit = false
+	c.DisallowedURLFilters = structs.GetRegex(config.URLFilters)
+
+	for _, filter := range config.URLFilters {
+		fmt.Fprintln(os.Stdout, []any{"Filter: ", &filter.Regexp}...)
+	}
 
 	for _, rule := range config.Rules {
 		c.OnHTML(rule.QuerySelector, func(h *colly.HTMLElement) {
-			item := structs.Item{
-				Source:    h.Request.URL.String(),
-				Title:     h.ChildText(rule.TitleSelector),
-				Excerpt:   h.ChildText(rule.ExcerptSelector),
-				Contents:  h.ChildText(rule.ContentSelector),
-				CrawledAt: time.Now(),
-			}
-			fmt.Fprintln(os.Stdout, []any{"Source: ", item.Source}...)
-			fmt.Fprintln(os.Stdout, []any{"Crawled at: ", item.CrawledAt.Local().String()}...)
-			fmt.Fprintln(os.Stdout, []any{"Title: ", item.Title}...)
-			fmt.Fprintln(os.Stdout, []any{"Excerpt: ", item.Excerpt}...)
-			fmt.Fprintln(os.Stdout, []any{"Contents: ", item.Contents}...)
+			item := structs.ToItem(h, rule)
+			fmt.Println(item.String())
 		})
 	}
+
+	c.OnHTML("a[href]", func(h *colly.HTMLElement) {
+		c.Visit(h.Attr("href"))
+	})
 
 	c.OnRequest(func(r *colly.Request) {
 		fmt.Fprintln(os.Stdout, []any{"Visiting: ", r.URL}...)
@@ -63,14 +68,13 @@ func parseSiteHost(site string) (string, error) {
 	return url.Host, nil
 }
 
-func parseFile(filename string) (*structs.Config, error) {
+func parseConfig(filename string) (*structs.Config, error) {
 	file, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
 
 	config := structs.Config{}
-
 	err = json.Unmarshal(file, &config)
 	if err != nil {
 		return nil, err
