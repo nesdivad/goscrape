@@ -33,18 +33,18 @@ func main() {
 	c := colly.NewCollector(
 		colly.AllowedDomains(sitehost),
 		colly.MaxDepth(config.Depth),
+		colly.Async(true),
 	)
 	c.AllowURLRevisit = false
 	c.DisallowedURLFilters = structs.GetRegex(config.URLFilters)
 
-	for _, filter := range config.URLFilters {
-		fmt.Fprintln(os.Stdout, []any{"Filter: ", &filter.Regexp}...)
-	}
+	items := []structs.Item{}
 
 	for _, rule := range config.Rules {
 		c.OnHTML(rule.QuerySelector, func(h *colly.HTMLElement) {
 			item := structs.ToItem(h, rule)
 			fmt.Println(item.String())
+			items = append(items, item)
 		})
 	}
 
@@ -57,6 +57,18 @@ func main() {
 	})
 
 	c.Visit(config.URL)
+	c.Wait()
+
+	for _, item := range items {
+		marshalled, err := json.Marshal(item)
+		if err != nil {
+			panic(fmt.Sprintf("Could not marshal response. \n Errors: %s", err))
+		}
+		err = os.WriteFile(fmt.Sprintf("%s/%s.json", config.OutputPath, item.Title), marshalled, 0644)
+		if err != nil {
+			panic(fmt.Sprintf("Could not write to file. \n Errors: %s", err))
+		}
+	}
 }
 
 func parseSiteHost(site string) (string, error) {
