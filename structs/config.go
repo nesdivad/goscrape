@@ -5,5 +5,5 @@ type Config struct {
 	URL        string      `json:"url"`
 	Depth      int         `json:"depth"`
 	URLFilters []URLFilter `json:"urlFilters"`
-	OutputPath string      `json:"outputPath"`
+	Output     Output      `json:"output"`
 }

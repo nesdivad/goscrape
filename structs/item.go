@@ -29,7 +29,7 @@ func (item Item) String() string {
 	return fmt.Sprintf(
 		"Source: %s \n Crawled at: %s \n Title: %s \n Excerpt: %s \n Contents: %s \n\n",
 		item.Source,
-		item.CrawledAt.Local().String(),
+		item.CrawledAt.UTC().String(),
 		item.Title,
 		item.Excerpt,
 		item.Contents,

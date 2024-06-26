@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -43,7 +44,6 @@ func main() {
 	for _, rule := range config.Rules {
 		c.OnHTML(rule.QuerySelector, func(h *colly.HTMLElement) {
 			item := structs.ToItem(h, rule)
-			fmt.Println(item.String())
 			items = append(items, item)
 		})
 	}
@@ -59,12 +59,36 @@ func main() {
 	c.Visit(config.URL)
 	c.Wait()
 
-	for _, item := range items {
-		marshalled, err := json.Marshal(item)
-		if err != nil {
-			panic(fmt.Sprintf("Could not marshal response. \n Errors: %s", err))
+	if config.Output.Filetype == "json" {
+		for _, item := range items {
+			marshal, err := json.Marshal(item)
+			if err != nil {
+				panic(fmt.Sprintf("Could not marshal response. \n Errors: %s", err))
+			}
+			err = os.WriteFile(fmt.Sprintf("%s/%s.json", config.Output.Path, item.Title), marshal, 0644)
+			if err != nil {
+				panic(fmt.Sprintf("Could not write to file. \n Errors: %s", err))
+			}
 		}
-		err = os.WriteFile(fmt.Sprintf("%s/%s.json", config.OutputPath, item.Title), marshalled, 0644)
+	} else if config.Output.Filetype == "jsonl" {
+		var w bytes.Buffer
+		for _, item := range items {
+			buffer := new(bytes.Buffer)
+			marshal, err := json.Marshal(item)
+			if err != nil {
+				panic(fmt.Sprintf("Could not marshal response. \n Errors: %s", err))
+			}
+			err = json.Compact(buffer, marshal)
+			if err != nil {
+				panic(fmt.Sprintf("Could not compact json. \n Errors: %s", err))
+			}
+			_, err = fmt.Fprintln(&w, buffer)
+			if err != nil {
+				panic(fmt.Sprintf("Could not write result to buffer. \n Errors: %s", err))
+			}
+		}
+
+		err = os.WriteFile(fmt.Sprintf("%s/%s.jsonl", config.Output.Path, config.Output.Filename), w.Bytes(), 0644)
 		if err != nil {
 			panic(fmt.Sprintf("Could not write to file. \n Errors: %s", err))
 		}

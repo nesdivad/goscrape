@@ -12,5 +12,9 @@
         "https://ndla.no/article/erklaering-for-informasjonskapsler"
     ],
     "depth": 1,
-    "outputPath": "output"
+    "output": {
+        "path": "output",
+        "fileType": "jsonl",
+        "fileName": "goscrape"
+    }
 }
