@@ -23,15 +23,15 @@ func init() {
 func main() {
 	config, err := parseConfig(configflag)
 	if err != nil {
-		panic(fmt.Sprintf("Could not parse configuration file. \n Error: %s", err))
+		panic(fmt.Sprintf("Could not parse configuration file.\nError: %s", err))
 	}
 	if err = config.Validate(); err != nil {
-		panic(fmt.Sprintf("Config validation failed. \n Error: %s", err))
+		panic(fmt.Sprintf("Config validation failed.\nError: %s", err))
 	}
 
 	sitehost, err := parseSiteHost(config.URL)
 	if err != nil {
-		panic(fmt.Sprintf("Could not parse url. \n Error: %s", err))
+		panic(fmt.Sprintf("Could not parse url.\nError: %s", err))
 	}
 
 	c := colly.NewCollector(
@@ -56,7 +56,11 @@ func main() {
 	})
 
 	c.OnRequest(func(r *colly.Request) {
-		fmt.Fprintln(os.Stdout, []any{"Visiting: ", r.URL}...)
+		fmt.Printf("Visiting: %s\n", r.URL)
+	})
+
+	c.OnError(func(r *colly.Response, err error) {
+		fmt.Printf("Error while visiting: %s\t Status code: %d\nErrors: %s\n", r.Request.URL, r.StatusCode, err)
 	})
 
 	c.Visit(config.URL)
@@ -66,11 +70,11 @@ func main() {
 		for _, item := range items {
 			marshal, err := json.Marshal(item)
 			if err != nil {
-				panic(fmt.Sprintf("Could not marshal response. \n Errors: %s", err))
+				panic(fmt.Sprintf("Could not marshal response.\nErrors: %s", err))
 			}
 			err = os.WriteFile(fmt.Sprintf("%s/%s.json", config.Output.Path, item.Title), marshal, 0644)
 			if err != nil {
-				panic(fmt.Sprintf("Could not write to file. \n Errors: %s", err))
+				panic(fmt.Sprintf("Could not write to file.\nErrors: %s", err))
 			}
 		}
 	} else if config.Output.Filetype == "jsonl" {
@@ -79,21 +83,20 @@ func main() {
 			buffer := new(bytes.Buffer)
 			marshal, err := json.Marshal(item)
 			if err != nil {
-				panic(fmt.Sprintf("Could not marshal response. \n Errors: %s", err))
+				panic(fmt.Sprintf("Could not marshal response.\nErrors: %s", err))
 			}
-			err = json.Compact(buffer, marshal)
-			if err != nil {
-				panic(fmt.Sprintf("Could not compact json. \n Errors: %s", err))
+			if err := json.Compact(buffer, marshal); err != nil {
+				panic(fmt.Sprintf("Could not compact json.\nErrors: %s", err))
 			}
 			_, err = fmt.Fprintln(&w, buffer)
 			if err != nil {
-				panic(fmt.Sprintf("Could not write result to buffer. \n Errors: %s", err))
+				panic(fmt.Sprintf("Could not write result to buffer.\nErrors: %s", err))
 			}
 		}
 
-		err = os.WriteFile(fmt.Sprintf("%s/%s.jsonl", config.Output.Path, config.Output.Filename), w.Bytes(), 0644)
-		if err != nil {
-			panic(fmt.Sprintf("Could not write to file. \n Errors: %s", err))
+		path := fmt.Sprintf("%s/%s.jsonl", config.Output.Path, config.Output.Filename)
+		if err := os.WriteFile(path, w.Bytes(), 0644); err != nil {
+			panic(fmt.Sprintf("Could not write to file.\nErrors: %s", err))
 		}
 	}
 }
@@ -114,8 +117,7 @@ func parseConfig(filename string) (*structs.Config, error) {
 	}
 
 	config := structs.Config{}
-	err = json.Unmarshal(file, &config)
-	if err != nil {
+	if err := json.Unmarshal(file, &config); err != nil {
 		return nil, err
 	}
 
