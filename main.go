@@ -25,6 +25,9 @@ func main() {
 	if err != nil {
 		panic(fmt.Sprintf("Could not parse configuration file. \n Error: %s", err))
 	}
+	if err = config.Validate(); err != nil {
+		panic(fmt.Sprintf("Config validation failed. \n Error: %s", err))
+	}
 
 	sitehost, err := parseSiteHost(config.URL)
 	if err != nil {

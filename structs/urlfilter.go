@@ -37,3 +37,8 @@ func GetRegex(f []URLFilter) []*regexp.Regexp {
 
 	return regexArr
 }
+
+// TODO
+func (u URLFilter) Validate() error {
+	return nil
+}
