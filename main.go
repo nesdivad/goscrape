@@ -58,7 +58,9 @@ func main() {
 	for _, rule := range config.Rules {
 		c.OnHTML(rule.QuerySelector, func(h *colly.HTMLElement) {
 			item := structs.ToItem(h, rule)
-			items = append(items, item)
+			if item.Contents != "" {
+				items = append(items, item)
+			}
 		})
 	}
 
