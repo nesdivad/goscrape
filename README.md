@@ -22,7 +22,16 @@ The tool uses a configuration file to define starting URL, rulesets etc.
         "https://ndla.no/article/erklaering-for-informasjonskapsler",
         ...
     ],
-    "depth": 1,
+    "settings": {
+        "depth": 1,
+        "limitRules": [
+            {
+                "domainGlob":"*ndla.*",
+                "parallelism": 2,
+                "randomDelay": 3
+            }
+        ]
+    },
     "output": {
         "path": "output",
         "fileType": "json | jsonl",

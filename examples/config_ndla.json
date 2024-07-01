@@ -9,9 +9,19 @@
         }
     ],
     "urlFilters": [
-        "https://ndla.no/article/erklaering-for-informasjonskapsler"
+        "https://ndla.no/article/erklaering-for-informasjonskapsler",
+        "https://ndla.no/article/personvernerklaering"
     ],
-    "depth": 1,
+    "settings": {
+        "depth": 2,
+        "limitRules": [
+            {
+                "domainGlob":"*ndla.*",
+                "parallelism": 2,
+                "randomDelay": 3
+            }
+        ]
+    },
     "output": {
         "path": "output",
         "fileType": "jsonl",

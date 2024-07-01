@@ -7,6 +7,7 @@ import (
 	"goscrape/structs"
 	"goscrape/utils"
 	"net/url"
+	"time"
 
 	"os"
 
@@ -36,11 +37,21 @@ func main() {
 
 	c := colly.NewCollector(
 		colly.AllowedDomains(sitehost),
-		colly.MaxDepth(config.Depth),
 		colly.Async(true),
 	)
+	if config.Settings.Depth > 0 {
+		c.MaxDepth = config.Settings.Depth
+	}
 	c.AllowURLRevisit = false
 	c.DisallowedURLFilters = structs.GetRegex(config.URLFilters)
+
+	for _, limit := range config.Settings.LimitRules {
+		c.Limit(&colly.LimitRule{
+			DomainGlob:  limit.DomainGlob,
+			RandomDelay: time.Duration(limit.RandomDelay) * time.Second,
+			Parallelism: limit.Parallelism,
+		})
+	}
 
 	items := []structs.Item{}
 

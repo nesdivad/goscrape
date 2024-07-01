@@ -5,7 +5,7 @@ import "errors"
 type Config struct {
 	Rules      []Rule      `json:"rules"`
 	URL        string      `json:"url"`
-	Depth      int         `json:"depth"`
+	Settings   Settings    `json:"settings"`
 	URLFilters []URLFilter `json:"urlFilters"`
 	Output     Output      `json:"output"`
 }

@@ -9,7 +9,7 @@ import (
 
 func WriteJsonl(items []structs.Item, path string) error {
 	var w bytes.Buffer
-	for _, item := range items {
+	for i, item := range items {
 		buffer := new(bytes.Buffer)
 		marshal, err := Marshal(item)
 		if err != nil {
@@ -18,7 +18,11 @@ func WriteJsonl(items []structs.Item, path string) error {
 		if err := Compact(buffer, marshal); err != nil {
 			return err
 		}
-		_, err = fmt.Fprintln(&w, buffer)
+		if i+1 == len(items) {
+			_, err = fmt.Fprint(&w, buffer)
+		} else {
+			_, err = fmt.Fprintln(&w, buffer)
+		}
 		if err != nil {
 			return fmt.Errorf("could not write result to buffer.\nErrors: %s", err)
 		}

@@ -1,0 +1,35 @@
+{
+    "url": "https://www.bouvet.no/bouvet-deler",
+    "rules": [
+        {
+            "querySelector": "div[id=main-container]",
+            "titleSelector": "h1",
+            "excerptSelector": "h1 + p",
+            "contentSelector": ".part-container"
+        },
+        {
+            "querySelector": "div[data-portal-region=main]",
+            "titleSelector": "h1",
+            "excerptSelector": "p[class=storytelling__lead]",
+            "contentSelector": "div[class*=storytelling__wrapper]"
+        },
+        {
+            "querySelector": "div[data-portal-region=main]",
+            "titleSelector": "h1",
+            "excerptSelector": "div[class=blog-header__wrapper]",
+            "contentSelector": ".layout-container .part-container"
+        }
+    ],
+    "urlFilters": [
+        "https://www.bouvet.no/podcasts"
+    ],
+    "settings": {
+        "depth": 1,
+        "limitRules": []
+    },
+    "output": {
+        "path": "output",
+        "fileType": "jsonl",
+        "fileName": "goscrape"
+    }
+}
