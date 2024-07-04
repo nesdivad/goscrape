@@ -12,8 +12,10 @@ import (
 
 var configflag string
 var configjsonflag string
+var verbose bool
 
 func init() {
+	flag.BoolVar(&verbose, "v", false, "Use flag if you want verbose logs.")
 	flag.StringVar(&configflag, "config", "", "Path to config file")
 	flag.StringVar(&configjsonflag, "configjson", "", "Config as a json-string. Compact version works best.")
 	flag.Parse()
@@ -67,7 +69,9 @@ func main() {
 	})
 
 	c.OnRequest(func(r *colly.Request) {
-		fmt.Printf("Visiting: %s\n", r.URL)
+		if verbose {
+			fmt.Printf("Visiting: %s\n", r.URL)
+		}
 	})
 
 	c.OnError(func(r *colly.Response, err error) {
@@ -85,8 +89,7 @@ func main() {
 			}
 		}
 	} else if config.Output.Filetype == "jsonl" {
-		path := fmt.Sprintf("%s/%s.jsonl", config.Output.Path, config.Output.Filename)
-		if err := utils.WriteJsonl(items, path); err != nil {
+		if err := utils.WriteJsonl(items, config.Output); err != nil {
 			panic(err)
 		}
 	}

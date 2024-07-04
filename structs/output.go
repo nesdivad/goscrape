@@ -6,6 +6,7 @@ type Output struct {
 	Path     string `json:"path"`
 	Filetype string `json:"fileType"`
 	Filename string `json:"fileName"`
+	Chunk    int    `json:"chunk"`
 }
 
 func (o *Output) Validate() error {
@@ -17,6 +18,9 @@ func (o *Output) Validate() error {
 	}
 	if o.Filename == "" {
 		o.Filename = "scrape"
+	}
+	if o.Chunk == 0 {
+		o.Chunk = 5
 	}
 	return nil
 }
