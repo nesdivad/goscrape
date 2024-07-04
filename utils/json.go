@@ -14,6 +14,7 @@ func marshal(item structs.Item) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("could not marshal response.\nErrors: %s", err)
 	}
+
 	return marshal, nil
 }
 
@@ -21,6 +22,7 @@ func compact(buffer *bytes.Buffer, bytes []byte) error {
 	if err := json.Compact(buffer, bytes); err != nil {
 		return fmt.Errorf("could not compact json.\nErrors: %s", err)
 	}
+
 	return nil
 }
 
@@ -29,8 +31,7 @@ func WriteJson(item structs.Item, path string) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	err = os.WriteFile(path, marshal, 0644)
-	if err != nil {
+	if err = os.WriteFile(path, marshal, 0644); err != nil {
 		return 0, fmt.Errorf("could not write to file.\nErrors: %s", err)
 	}
 

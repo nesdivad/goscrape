@@ -14,7 +14,7 @@ func WriteJsonl(items []structs.Item, output structs.Output) (int, error) {
 
 	for i, chunk := range chunks {
 		var w bytes.Buffer
-		for _, item := range chunk {
+		for j, item := range chunk {
 			buffer := new(bytes.Buffer)
 			marshal, err := marshal(item)
 			if err != nil {
@@ -23,7 +23,7 @@ func WriteJsonl(items []structs.Item, output structs.Output) (int, error) {
 			if err := compact(buffer, marshal); err != nil {
 				return bytesWritten, err
 			}
-			if i+1 == len(chunk) {
+			if j+1 == len(chunk) {
 				_, err = fmt.Fprint(&w, buffer)
 			} else {
 				_, err = fmt.Fprintln(&w, buffer)
@@ -37,6 +37,7 @@ func WriteJsonl(items []structs.Item, output structs.Output) (int, error) {
 		if err := os.WriteFile(path, w.Bytes(), 0644); err != nil {
 			return bytesWritten, fmt.Errorf("could not write to file.\nErrors: %s", err)
 		}
+
 		bytesWritten += binary.Size(w.Bytes())
 	}
 
