@@ -1,28 +1,26 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
 	"goscrape/structs"
 	"goscrape/utils"
-	"net/url"
 	"time"
-
-	"os"
 
 	"github.com/gocolly/colly"
 )
 
 var configflag string
+var configjsonflag string
 
 func init() {
 	flag.StringVar(&configflag, "config", "", "Path to config file")
+	flag.StringVar(&configjsonflag, "configjson", "", "Config as a json-string. Compact version works best.")
 	flag.Parse()
 }
 
 func main() {
-	config, err := parseConfig(configflag)
+	config, err := utils.ParseConfig(configflag, configjsonflag)
 	if err != nil {
 		panic(fmt.Sprintf("Could not parse configuration file.\nError: %s", err))
 	}
@@ -30,7 +28,7 @@ func main() {
 		panic(fmt.Sprintf("Config validation failed.\nError: %s", err))
 	}
 
-	sitehost, err := parseSiteHost(config.URL)
+	sitehost, err := utils.ParseSiteHost(config.URL)
 	if err != nil {
 		panic(fmt.Sprintf("Could not parse url.\nError: %s", err))
 	}
@@ -92,27 +90,4 @@ func main() {
 			panic(err)
 		}
 	}
-}
-
-func parseSiteHost(site string) (string, error) {
-	url, err := url.Parse(site)
-	if err != nil {
-		return "", err
-	}
-
-	return url.Host, nil
-}
-
-func parseConfig(filename string) (*structs.Config, error) {
-	file, err := os.ReadFile(filename)
-	if err != nil {
-		return nil, err
-	}
-
-	config := structs.Config{}
-	if err := json.Unmarshal(file, &config); err != nil {
-		return nil, err
-	}
-
-	return &config, nil
 }
