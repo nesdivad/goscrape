@@ -26,6 +26,6 @@
     "path": "output",
     "fileType": "jsonl",
     "fileName": "goscrape",
-    "chunk": 2
+    "chunk": 3
   }
 }

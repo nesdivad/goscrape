@@ -8,9 +8,9 @@ import (
 )
 
 func WriteJsonl(items []structs.Item, output structs.Output) error {
-	var w bytes.Buffer
 	chunks := chunkBy(items, output.Chunk)
 	for i, chunk := range chunks {
+		var w bytes.Buffer
 		for _, item := range chunk {
 			buffer := new(bytes.Buffer)
 			marshal, err := Marshal(item)
@@ -20,7 +20,7 @@ func WriteJsonl(items []structs.Item, output structs.Output) error {
 			if err := Compact(buffer, marshal); err != nil {
 				return err
 			}
-			if i+1 == len(items) {
+			if i+1 == len(chunk) {
 				_, err = fmt.Fprint(&w, buffer)
 			} else {
 				_, err = fmt.Fprintln(&w, buffer)
