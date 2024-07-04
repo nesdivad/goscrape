@@ -1,8 +1,21 @@
 # Goscrape
 
+## Get started
+
+1. To run the program locally, you need [Go](https://go.dev/dl/) installed on your machine.  
+2. Install it on your local path by running `install.sh` on Linux/Mac, and running `goscrape [arguments]`.  
+   Alternatively, run the program with the Go CLI, using `go run main.go [arguments]`.  
+
+## Help
+
+After installation, run the program with the `--help` argument for a description of the arguments.
+
 ## Configuration file
 
 The tool uses a configuration file to define starting URL, rulesets etc.
+There are two ways to feed the configuration into the program:
+1. Using `--config` flag with the path to the config file.
+2. Using `--configjson` flag containing the config as a json-string, preferably compacted and without whitespace, newlines etc. 
 
 ### Example
 
