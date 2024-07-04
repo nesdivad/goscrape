@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"goscrape/statistics"
 	"goscrape/structs"
 	"goscrape/utils"
 	"time"
@@ -13,12 +14,17 @@ import (
 var configflag string
 var configjsonflag string
 var verbose bool
+var stats *statistics.Statistics
 
 func init() {
 	flag.BoolVar(&verbose, "v", false, "Use flag if you want verbose logs.")
 	flag.StringVar(&configflag, "config", "", "Path to config file")
 	flag.StringVar(&configjsonflag, "configjson", "", "Config as a json-string. Compact version works best.")
 	flag.Parse()
+
+	if verbose {
+		stats = statistics.New()
+	}
 }
 
 func main() {
@@ -71,6 +77,7 @@ func main() {
 	c.OnRequest(func(r *colly.Request) {
 		if verbose {
 			fmt.Printf("Visiting: %s\n", r.URL)
+			stats.NumberOfPages += 1
 		}
 	})
 
@@ -84,13 +91,25 @@ func main() {
 	if config.Output.Filetype == "json" {
 		for _, item := range items {
 			path := fmt.Sprintf("%s/%s.json", config.Output.Path, item.Title)
-			if err := utils.WriteJson(item, path); err != nil {
+			bytesWritten, err := utils.WriteJson(item, path)
+			if err != nil {
 				panic(err)
+			}
+			if verbose {
+				stats.BytesWritten += bytesWritten
 			}
 		}
 	} else if config.Output.Filetype == "jsonl" {
-		if err := utils.WriteJsonl(items, config.Output); err != nil {
+		bytesWritten, err := utils.WriteJsonl(items, config.Output)
+		if err != nil {
 			panic(err)
 		}
+		if verbose {
+			stats.BytesWritten = bytesWritten
+		}
+	}
+
+	if verbose {
+		stats.Print()
 	}
 }
