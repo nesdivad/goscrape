@@ -1,4 +1,6 @@
-# Goscrape
+# Goscrape 
+
+[![Go](https://github.com/davidsenkristoffer/goscrape/actions/workflows/go.yml/badge.svg)](https://github.com/davidsenkristoffer/goscrape/actions/workflows/go.yml)
 
 ## Get started
 
