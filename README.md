@@ -55,3 +55,9 @@ There are two ways to feed the configuration into the program:
     }
 }
 ```
+
+- `url`: Starting url for scraping.
+- `rules`: Set of rules for scraping. Each rule creates a JSON-object, so keep that in mind if you want to use multiple rules for a page.
+- `urlFilters`: Exclude urls from scraping.
+- `settings`: Settings for the scraper.
+- `output`: Settings for output after scraping is finished.
